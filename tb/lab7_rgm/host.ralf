@@ -1,0 +1,58 @@
+# It's not portable across integration and projects not to use RAL, because the addresses are hard-coded
+# using a abstract register to represent the DUT registers can help.
+
+# This file contains the DUT register and memory definitions to represent these set of registers and memory
+# Populate each of the following register and memory specification. The system definition isn't necessary in this lab, because I'm verifying the DUT at the block level
+
+# convert the RAL file into UVM register classes with ralgen:
+# > ralgen -uvm -t host_regmodel host.ralf
+# then a file called ral_host_regmodel.sv will be created by ralgen.
+register HOST_ID {
+#  ToDo
+  field REV_ID {
+    bits 8;
+    access ro;
+    reset 'h03;
+  }
+  field CHIP_ID {
+    bits 8;
+    access ro;
+    reset 'h5A;
+  }
+}
+
+register PORT_LOCK {
+#  ToDo
+  field LOCK {
+    bits 16;
+    access w1c;
+    reset 'hffff;
+  }
+}
+
+register REG_ARRAY {
+#  ToDo
+  field USER_REG {
+    bits 16;
+    access rw;
+    reset 'h0;
+  }
+}
+
+memory RAM {
+#  ToDo
+  size 4k;
+  bits 16;
+  access rw;
+}
+
+# The block level declaration. 
+# include the hdl_path name for the signals in the DUT.
+# Later on, the hdl_path will be in RAL backdoor access.
+block host_regmodel {
+  bytes 2;
+  register HOST_ID        (host_id)       @'h0000;
+  register PORT_LOCK      (lock)          @'h0100;
+  register REG_ARRAY[256] (host_reg[%d])  @'h1000; # array must specify HDL index
+  memory   RAM            (ram)           @'h4000;
+}
